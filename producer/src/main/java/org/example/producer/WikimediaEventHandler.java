@@ -24,13 +24,13 @@ public class WikimediaEventHandler implements EventHandler {
     }
 
     @Override
-    public void onMessage(String s, MessageEvent messageEvent) throws Exception {
+    public void onMessage(String s, MessageEvent messageEvent) {
         log.info("Processing event: {}, with comment {}", messageEvent, s);
         kafkaTemplate.send("wikimedia-topic", messageEvent.getData());
     }
 
     @Override
-    public void onComment(String s) throws Exception {
+    public void onComment(String s) {
 
     }
 

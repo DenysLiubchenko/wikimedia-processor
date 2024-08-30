@@ -19,5 +19,6 @@ public class WikimediaProducer {
         EventSource.Builder builder = new EventSource.Builder(eventHandler, URI.create(url));
         EventSource eventSource = builder.build();
         eventSource.start();
+        eventSource.close();
     }
 }

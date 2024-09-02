@@ -3,7 +3,8 @@ package org.example.consumer.listener;
 import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.opensearch.action.bulk.BulkRequest;
+import org.opensearch.action.bulk.BulkResponse;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.index.IndexResponse;
 import org.opensearch.client.RequestOptions;
@@ -13,6 +14,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -20,17 +22,36 @@ import java.io.IOException;
 public class WikimediaListener {
     private final RestHighLevelClient restHighLevelClient;
 
-    @KafkaListener(topics = "wikimedia-topic", groupId = "wikimedia-event-consumers")
-    public void process(ConsumerRecord<String, String> message) throws IOException {
+//    @KafkaListener(topics = "wikimedia-topic", groupId = "wikimedia-event-consumers")
+    public void process(String message) throws IOException {
         log.info("Received: {}", message);
 
-        String id = extractId(message.value());
-        IndexRequest indexRequest = new IndexRequest("wikimedia")
-                .source(message.value(), XContentType.JSON)
-                .id(id);
+        IndexRequest indexRequest = getIndexRequest(message);
         IndexResponse response = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
 
         log.info("Successfully saved with id: {}", response.getId());
+    }
+
+    // Batch listener with manual offset commiting
+    @KafkaListener(topics = "wikimedia-topic", groupId = "wikimedia-event-consumers")
+    public void processBatch(List<String> messages) throws IOException {
+        log.info("Received: {} messages", messages.size());
+
+        BulkRequest bulkRequest = new BulkRequest();
+        messages.stream()
+                .map(this::getIndexRequest)
+                .forEach(bulkRequest::add);
+
+        BulkResponse response = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+
+        log.info("Successfully saved: {} items", response.getItems().length);
+    }
+
+    private IndexRequest getIndexRequest(String message) {
+        String id = extractId(message);
+        return new IndexRequest("wikimedia")
+                .source(message, XContentType.JSON)
+                .id(id);
     }
 
     private String extractId(String json) {

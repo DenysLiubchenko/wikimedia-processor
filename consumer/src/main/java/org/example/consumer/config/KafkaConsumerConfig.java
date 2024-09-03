@@ -1,5 +1,7 @@
 package org.example.consumer.config;
 
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +19,8 @@ import java.util.Map;
 
 @Configuration
 public class KafkaConsumerConfig {
+    @Value("${schema.registry.url}")
+    public String schemaRegistry;
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServer;
 
@@ -43,9 +47,12 @@ public class KafkaConsumerConfig {
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class);
         // Disable Offset auto-commit
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+
+        config.put(KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistry);
+        config.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, "true");
         return config;
     }
 }

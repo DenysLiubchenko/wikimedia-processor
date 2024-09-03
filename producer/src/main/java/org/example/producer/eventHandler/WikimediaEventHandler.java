@@ -1,7 +1,9 @@
 package org.example.producer.eventHandler;
 
+import com.google.gson.Gson;
 import com.launchdarkly.eventsource.EventHandler;
 import com.launchdarkly.eventsource.MessageEvent;
+import com.wikimedia.RecentChange;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -11,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 public class WikimediaEventHandler implements EventHandler {
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<String, RecentChange> kafkaTemplate;
 
     @Override
     public void onOpen() {
@@ -26,7 +28,9 @@ public class WikimediaEventHandler implements EventHandler {
     @Override
     public void onMessage(String s, MessageEvent messageEvent) {
         log.info("Processing event: {}, with comment {}", messageEvent, s);
-        kafkaTemplate.send("wikimedia-topic", messageEvent.getData());
+        String data = messageEvent.getData();
+        RecentChange message = new Gson().fromJson(data, RecentChange.class);
+        kafkaTemplate.send("wikimedia-avro-topic", message);
     }
 
     @Override

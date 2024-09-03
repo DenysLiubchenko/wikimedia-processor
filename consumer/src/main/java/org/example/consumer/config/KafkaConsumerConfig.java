@@ -1,5 +1,6 @@
 package org.example.consumer.config;
 
+import com.wikimedia.RecentChange;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -25,16 +26,16 @@ public class KafkaConsumerConfig {
     private String bootstrapServer;
 
     @Bean
-    public ConsumerFactory<String, String> consumerFactory() {
+    public ConsumerFactory<String, RecentChange> consumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfig());
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>>
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, RecentChange>>
     kafkaListenerContainerFactory(
-        ConsumerFactory<String, String> consumerFactory) {
+        ConsumerFactory<String, RecentChange> consumerFactory) {
         var factory =
-            new ConcurrentKafkaListenerContainerFactory<String, String>();
+            new ConcurrentKafkaListenerContainerFactory<String, RecentChange>();
         factory.setConsumerFactory(consumerFactory);
         // Enabling manual offset commit
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
@@ -50,6 +51,8 @@ public class KafkaConsumerConfig {
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class);
         // Disable Offset auto-commit
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+
+        config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "100");
 
         config.put(KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistry);
         config.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, "true");

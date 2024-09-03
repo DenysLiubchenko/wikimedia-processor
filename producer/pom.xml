@@ -16,6 +16,7 @@
         <java.version>21</java.version>
         <okhttp.version>4.9.3</okhttp.version>
         <okhttp-eventsource.version>2.5.0</okhttp-eventsource.version>
+        <gson.version>2.9.0</gson.version>
     </properties>
 
     <dependencies>
@@ -29,6 +30,12 @@
             <groupId>com.launchdarkly</groupId>
             <artifactId>okhttp-eventsource</artifactId>
             <version>${okhttp-eventsource.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
         </dependency>
     </dependencies>
 

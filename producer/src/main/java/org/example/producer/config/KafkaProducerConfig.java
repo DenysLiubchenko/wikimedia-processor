@@ -1,5 +1,6 @@
 package org.example.producer.config;
 
+import com.wikimedia.RecentChange;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -22,12 +23,12 @@ public class KafkaProducerConfig {
     private String bootstrapServer;
 
     @Bean
-    public ProducerFactory<String, String> producerFactory() {
+    public ProducerFactory<String, RecentChange> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
     @Bean
-    public KafkaTemplate<String, String> kafkaTemplate(ProducerFactory<String, String> producerFactory) {
+    public KafkaTemplate<String, RecentChange> kafkaTemplate(ProducerFactory<String, RecentChange> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
 

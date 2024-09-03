@@ -60,33 +60,10 @@
 			<scope>test</scope>
 		</dependency>
 
-
-		<!--Only dependency needed for the avro part-->
-		<!-- https://mvnrepository.com/artifact/org.apache.avro/avro -->
-		<dependency>
-			<groupId>org.apache.avro</groupId>
-			<artifactId>avro</artifactId>
-			<version>${avro.version}</version>
-		</dependency>
-
 		<dependency>
 			<groupId>io.confluent</groupId>
 			<artifactId>kafka-avro-serializer</artifactId>
 			<version>${confluent.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.avro</groupId>
-					<artifactId>avro</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>commons-compress</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>io.confluent</groupId>
-					<artifactId>kafka-schema-registry-client</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 	</dependencies>
 

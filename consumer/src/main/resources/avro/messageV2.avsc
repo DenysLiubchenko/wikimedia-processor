@@ -1,0 +1,44 @@
+[
+  {
+    "type": "record",
+    "name": "Meta",
+    "namespace": "com.wikimedia",
+    "fields": [
+      {
+        "name": "id",
+        "type": "string"
+      }
+    ]
+  },
+  {
+    "type": "record",
+    "name": "RecentChange",
+    "namespace": "com.wikimedia",
+    "fields": [
+      {
+        "name": "meta",
+        "type": "com.wikimedia.Meta"
+      },
+      {
+        "name": "id",
+        "type": "long"
+      },
+      {
+        "name": "comment",
+        "type": "string"
+      },
+      {
+        "name": "timestamp",
+        "type": "long"
+      },
+      {
+        "name": "user",
+        "type": "string"
+      },
+      {
+        "name": "wiki",
+        "type": "string"
+      }
+    ]
+  }
+]

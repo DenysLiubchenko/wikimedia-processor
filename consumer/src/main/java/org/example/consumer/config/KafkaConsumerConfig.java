@@ -25,14 +25,14 @@ public class KafkaConsumerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServer;
 
-    @Bean
-    public ConsumerFactory<String, RecentChange> consumerFactory() {
+    @Bean(name = "consumerFactoryV2")
+    public ConsumerFactory<String, RecentChange> consumerFactoryV2() {
         return new DefaultKafkaConsumerFactory<>(consumerConfig());
     }
 
-    @Bean
+    @Bean(name = "kafkaListenerContainerFactoryV2")
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, RecentChange>>
-    kafkaListenerContainerFactory(
+    kafkaListenerContainerFactoryV2(
         ConsumerFactory<String, RecentChange> consumerFactory) {
         var factory =
             new ConcurrentKafkaListenerContainerFactory<String, RecentChange>();

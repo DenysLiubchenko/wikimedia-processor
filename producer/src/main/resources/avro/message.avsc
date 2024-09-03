@@ -85,52 +85,6 @@
       "type": "boolean"
     },
     {
-      "name": "notify_url",
-      "type": "string"
-    },
-    {
-      "name": "minor",
-      "type": "boolean"
-    },
-    {
-      "name": "patrolled",
-      "type": "boolean"
-    },
-    {
-      "name": "length",
-      "type": {
-        "type": "record",
-        "name": "Length",
-        "fields": [
-          {
-            "name": "old",
-            "type": "int"
-          },
-          {
-            "name": "new",
-            "type": "int"
-          }
-        ]
-      }
-    },
-    {
-      "name": "revision",
-      "type": {
-        "type": "record",
-        "name": "Revision",
-        "fields": [
-          {
-            "name": "old",
-            "type": "long"
-          },
-          {
-            "name": "new",
-            "type": "long"
-          }
-        ]
-      }
-    },
-    {
       "name": "server_url",
       "type": "string"
     },
@@ -144,10 +98,6 @@
     },
     {
       "name": "wiki",
-      "type": "string"
-    },
-    {
-      "name": "parsedcomment",
       "type": "string"
     }
   ]

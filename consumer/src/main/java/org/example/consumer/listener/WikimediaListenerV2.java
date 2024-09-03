@@ -19,12 +19,14 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class WikimediaListener {
-    private final RestHighLevelClient restHighLevelClient;
+public class WikimediaListenerV2 {
+    private final RestHighLevelClient restHighLevelClientV2;
 
     // Batch listener with manual offset commiting
-    @KafkaListener(topics = "wikimedia-avro-topic", groupId = "wikimedia-event-consumers")
-    public void processBatch(List<RecentChange> messages, Acknowledgment acknowledgment) throws IOException {
+    @KafkaListener(topics = "wikimedia-avro-topic",
+            groupId = "wikimedia-event-consumers-v2",
+            containerFactory = "kafkaListenerContainerFactoryV2")
+    public void processBatchV2(List<RecentChange> messages, Acknowledgment acknowledgment) throws IOException {
         log.info("Received: {} messages", messages.size());
 
         BulkRequest bulkRequest = new BulkRequest();
@@ -32,20 +34,18 @@ public class WikimediaListener {
                 .map(this::getIndexRequest)
                 .forEach(bulkRequest::add);
 
-        BulkResponse response = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+        BulkResponse response = restHighLevelClientV2.bulk(bulkRequest, RequestOptions.DEFAULT);
 
         acknowledgment.acknowledge();
         log.info("Successfully saved: {} items", response.getItems().length);
     }
 
+
+
     private IndexRequest getIndexRequest(RecentChange message) {
-        String id = extractId(message);
+        String id = message.getMeta().getId();
         return new IndexRequest("wikimedia")
                 .source(message, XContentType.JSON)
                 .id(id);
-    }
-
-    private String extractId(RecentChange message) {
-        return message.getMeta().getId();
     }
 }

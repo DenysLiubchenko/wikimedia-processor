@@ -1,23 +1,23 @@
 package org.example.producer.producer;
 
-import com.launchdarkly.eventsource.EventSource;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
+import com.google.gson.Gson;
+import com.wikimedia.RecentChange;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class WikimediaProducer {
-    private final EventSource eventSource;
+    private final KafkaTemplate<String, RecentChange> kafkaTemplate;
 
-    @PostConstruct
-    public void startReadingStream() {
-        eventSource.start();
-    }
-
-    @PreDestroy
-    public void stopReadingStream() {
-        eventSource.close();
+    public void sendEvent(ServerSentEvent<String> message) {
+        log.info("Processing event: {}", message);
+        String data = message.data();
+        RecentChange change = new Gson().fromJson(data, RecentChange.class);
+        kafkaTemplate.send("wikimedia-avro-topic", change);
     }
 }

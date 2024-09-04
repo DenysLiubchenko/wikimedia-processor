@@ -13,11 +13,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class WikimediaProducer {
     private final KafkaTemplate<String, RecentChange> kafkaTemplate;
+    private final Gson gson;
 
     public void sendEvent(ServerSentEvent<String> message) {
         log.info("Processing event: {}", message);
         String data = message.data();
-        RecentChange change = new Gson().fromJson(data, RecentChange.class);
-        kafkaTemplate.send("wikimedia-avro-topic", change);
+        RecentChange change = gson.fromJson(data, RecentChange.class);
+        var result = kafkaTemplate.send("wikimedia-avro-topic", change);
+//        log.info("Sent event: {}", result.get());
     }
 }

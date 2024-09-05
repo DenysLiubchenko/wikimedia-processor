@@ -16,10 +16,10 @@ public class WikimediaProducer {
     private final Gson gson;
 
     public void sendEvent(ServerSentEvent<String> message) {
+        if (message.data() == null) return;
         log.info("Processing event: {}", message);
         String data = message.data();
         RecentChange change = gson.fromJson(data, RecentChange.class);
-        var result = kafkaTemplate.send("wikimedia-avro-topic", change);
-//        log.info("Sent event: {}", result.get());
+        kafkaTemplate.send("wikimedia-avro-topic", change);
     }
 }

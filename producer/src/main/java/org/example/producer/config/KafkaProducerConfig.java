@@ -7,6 +7,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -16,15 +17,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@ComponentScan("org.example.producer")
 public class KafkaProducerConfig {
-    @Value("${schema.registry.url}")
-    public String schemaRegistry;
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapServer;
-
     @Bean
-    public ProducerFactory<String, RecentChange> producerFactory() {
-        return new DefaultKafkaProducerFactory<>(producerConfig());
+    public ProducerFactory<String, RecentChange> producerFactory(@Value("${kafka.schema.registry.url}") String schemaRegistry,
+                                                                 @Value("${kafka.bootstrap-servers}") String bootstrapServer) {
+        return new DefaultKafkaProducerFactory<>(producerConfig(schemaRegistry, bootstrapServer));
     }
 
     @Bean
@@ -32,7 +30,7 @@ public class KafkaProducerConfig {
         return new KafkaTemplate<>(producerFactory);
     }
 
-    private Map<String, Object> producerConfig() {
+    private Map<String, Object> producerConfig(String schemaRegistry, String bootstrapServer) {
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -45,6 +43,7 @@ public class KafkaProducerConfig {
         config.put(ProducerConfig.BATCH_SIZE_CONFIG, 32 * 1024);
 
         config.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistry);
+        config.put(KafkaAvroSerializerConfig.AUTO_REGISTER_SCHEMAS, false);
         return config;
     }
 }

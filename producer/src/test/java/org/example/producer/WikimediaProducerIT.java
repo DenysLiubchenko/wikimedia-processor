@@ -1,16 +1,15 @@
-package org.example.producer.producer;
+package org.example.producer;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.wikimedia.Meta;
 import com.wikimedia.RecentChange;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaString;
 import org.awaitility.Awaitility;
-import org.example.producer.Config;
 import org.example.producer.config.KafkaProducerConfig;
+import org.example.producer.producer.WikimediaProducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +29,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -38,7 +41,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("test")
-@EnableAutoConfiguration
 @EmbeddedKafka(controlledShutdown = true, topics = {"wikimedia-avro-topic"} )
 class WikimediaProducerIT {
     public static final String WIKIMEDIA_AVRO_TOPIC = "wikimedia-avro-topic";
@@ -63,13 +65,13 @@ class WikimediaProducerIT {
         AtomicInteger counter = new AtomicInteger(0);
         AtomicReference<RecentChange> result = new AtomicReference<>();
 
-        @KafkaListener(groupId = "PaymentIntegrationTest", topics = WIKIMEDIA_AVRO_TOPIC,
-                containerFactory = "testKafkaListenerContainerFactory", autoStartup = "true")
+        @KafkaListener(groupId = "PaymentIntegrationTest", topics = WIKIMEDIA_AVRO_TOPIC, autoStartup = "true")
         void receive(@Payload final RecentChange recentChange) {
             counter.incrementAndGet();
             result.set(recentChange);
         }
     }
+
     @BeforeEach
     public void setUp() throws Exception {
         registry.getListenerContainers().forEach(container ->
@@ -94,7 +96,6 @@ class WikimediaProducerIT {
         stubFor(get(urlPathMatching("/schemas/ids/"+schemaId))
                 .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json")
                         .withBody(schemaString.toJson())));
-
     }
 
     @Test

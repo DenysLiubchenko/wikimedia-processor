@@ -6,7 +6,7 @@
 
 # Kafka
 - Port: 9092
-- Topic: "wikimedia-topic"
+- Topic: "wikimedia-avro-topic"
 
 # Schema Registry
 - Port: 8081

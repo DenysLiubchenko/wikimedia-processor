@@ -1,5 +1,6 @@
 package org.example.producer.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ParameterizedTypeReference;
@@ -9,12 +10,9 @@ import reactor.core.publisher.Flux;
 
 @Configuration
 public class EventSourceConfig {
-
-    public static final String DATA_STREAM_URL = "https://stream.wikimedia.org/v2/stream/recentchange";
-
     @Bean
-    public WebClient webClient() {
-        return WebClient.create(DATA_STREAM_URL);
+    public WebClient webClient(@Value("wikimedia.event.stream.url") String url) {
+        return WebClient.create(url);
     }
 
     @Bean

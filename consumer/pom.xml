@@ -15,24 +15,21 @@
     <properties>
         <java.version>21</java.version>
         <opensearch-client.version>1.2.4</opensearch-client.version>
-        <gson.version>2.9.0</gson.version>
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.opensearch.client/opensearch-rest-high-level-client -->
         <dependency>
             <groupId>org.opensearch.client</groupId>
             <artifactId>opensearch-rest-high-level-client</artifactId>
             <version>${opensearch-client.version}</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-contract-wiremock</artifactId>
+            <version>4.1.4</version>
+            <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>

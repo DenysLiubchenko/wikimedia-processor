@@ -65,7 +65,8 @@ class WikimediaProducerIT {
         AtomicInteger counter = new AtomicInteger(0);
         AtomicReference<RecentChange> result = new AtomicReference<>();
 
-        @KafkaListener(groupId = "PaymentIntegrationTest", topics = WIKIMEDIA_AVRO_TOPIC, autoStartup = "true")
+        @KafkaListener(groupId = "PaymentIntegrationTest",containerFactory = "testKafkaListenerContainerFactory",
+                topics = WIKIMEDIA_AVRO_TOPIC, autoStartup = "true")
         void receive(@Payload final RecentChange recentChange) {
             counter.incrementAndGet();
             result.set(recentChange);

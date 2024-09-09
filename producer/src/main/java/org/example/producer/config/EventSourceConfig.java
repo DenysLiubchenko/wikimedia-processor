@@ -11,7 +11,7 @@ import reactor.core.publisher.Flux;
 @Configuration
 public class EventSourceConfig {
     @Bean
-    public WebClient webClient(@Value("wikimedia.event.stream.url") String url) {
+    public WebClient webClient(@Value("${wikimedia.event.stream.url}") String url) {
         return WebClient.create(url);
     }
 

@@ -9,6 +9,8 @@ import org.example.consumer.config.KafkaConsumerConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.opensearch.action.bulk.BulkItemResponse;
 import org.opensearch.action.bulk.BulkRequest;
 import org.opensearch.action.bulk.BulkResponse;
@@ -55,8 +57,10 @@ public class WikimediaConsumerIT {
     private KafkaListenerEndpointRegistry registry;
     @Autowired
     private KafkaTemplate<String, RecentChange> testKafkaTemplate;
-    @MockBean(name = "restHighLevelClient")
+    @MockBean
     private RestHighLevelClient restHighLevelClient;
+    @Captor
+    private ArgumentCaptor<BulkRequest> bulkRequestCaptor;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -95,8 +99,8 @@ public class WikimediaConsumerIT {
         given(restHighLevelClient.bulk(any(BulkRequest.class), eq(RequestOptions.DEFAULT))).willReturn(bulkResponse);
 
         testKafkaTemplate.send(record).get();
-        Thread.sleep(100);
+        Thread.sleep(1000);
 
-        verify(restHighLevelClient).bulk(any(BulkRequest.class), eq(RequestOptions.DEFAULT));
+        verify(restHighLevelClient).bulk(bulkRequestCaptor.capture(), eq(RequestOptions.DEFAULT));
     }
 }
